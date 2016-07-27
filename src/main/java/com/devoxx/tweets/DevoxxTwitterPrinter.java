@@ -14,6 +14,8 @@ import java.util.stream.StreamSupport;
 /**
  * The Devoxx twitter printer.
  *
+ * Uses the IBM BlueMix Twitter Insights REST call.
+ *
  * @author Stephan Janssen
  */
 public class DevoxxTwitterPrinter {
@@ -58,6 +60,10 @@ public class DevoxxTwitterPrinter {
         return new JsonParser().parse(doc.text());
     }
 
+    /**
+     * The BlueMix Twitter Insights credentials.
+     * @return base64login
+     */
     private String getBase64Login() {
         final String username = "18a89a22-ba35-4d79-9142-98562fb2b0e5";
         final String password = "O0UhQaHETe";
