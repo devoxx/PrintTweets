@@ -10,3 +10,5 @@ See MediaTweets.txt for the output from the app and DevoxxTweets.json for the RA
 * Should "store" tweets that have been printed successfully, to avoid duplicates 
 * Create a twitter template for the printer
 * Execute the actual printing
+
+![Print examples](https://c2.staticflickr.com/8/7600/27683391705_14abbcba05_z.jpg)
