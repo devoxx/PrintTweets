@@ -20,13 +20,10 @@ import java.util.stream.StreamSupport;
  */
 public class DevoxxTwitterPrinter {
 
-    int counter = 0;
-
-    final String GET_FIRST_DEVOXX_TWEETS_QUERY =
-            "https://cdeservice.mybluemix.net/api/v1/messages/search?q=Devoxx&from=0&size=100";
+    private int counter = 0;
 
     public DevoxxTwitterPrinter() throws IOException {
-        String url = GET_FIRST_DEVOXX_TWEETS_QUERY;
+        String url = "https://cdeservice.mybluemix.net/api/v1/messages/search?q=Devoxx&from=0&size=100";
 
         while (url != null) {
 
