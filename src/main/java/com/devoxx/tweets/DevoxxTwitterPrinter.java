@@ -37,10 +37,23 @@ public class DevoxxTwitterPrinter {
 
             JsonElement jsonTweets = readTweets(url);
 
+            printTotalTweetsFound((JsonObject) jsonTweets);
+
             printMediaTweets(jsonTweets);
 
             url = getNextUrl((JsonObject) jsonTweets);
         }
+    }
+
+    /**
+     * Not sure if the total of number of Devoxx tweets gets updated for each call?
+     * So using this method to check the nbr of tweets found (was 7949 on July 30th 2016)
+     *
+     * @param jsonTweets the total list of devoxx tweets
+     */
+    private void printTotalTweetsFound(final JsonObject jsonTweets) {
+        int totalTweets = jsonTweets.getAsJsonObject("search").get("results").getAsInt();
+        System.out.println(String.format("Found %d tweets", totalTweets));
     }
 
     private String getNextUrl(final JsonObject jsonTweets) {
@@ -117,6 +130,10 @@ public class DevoxxTwitterPrinter {
         }
     }
 
+    /**
+     * Store the Set of printed twitter identifiers to disk.
+     * @param id save the twitter id
+     */
     private void savePrintedId(String id) {
         printedIds.add(id);
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(printedIdsFile))) {
@@ -126,6 +143,11 @@ public class DevoxxTwitterPrinter {
         }
     }
 
+    /**
+     * Load the printed tweets.
+     *
+     * Delete this file if you want to start from scratch.
+     */
     private void loadPrintedTweets() {
         System.out.println("Loading printed tweets from "+printedIdsFile.getAbsolutePath());
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(printedIdsFile))) {
