@@ -31,11 +31,11 @@ public class DevoxxTwitterPrinter {
     public DevoxxTwitterPrinter() throws IOException {
         String url = "https://cdeservice.mybluemix.net/api/v1/messages/search?q=Devoxx&from=0&size=100";
 
+        loadPrintedTweets();
+
         while (url != null) {
 
             JsonElement jsonTweets = readTweets(url);
-
-            loadPrintedTweets();
 
             printMediaTweets(jsonTweets);
 
