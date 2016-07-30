@@ -92,15 +92,17 @@ public class DevoxxTwitterPrinter {
     private void printTweet(final JsonElement jsonElement) {
 
         final JsonElement message = jsonElement.getAsJsonObject().get("message");
-        final JsonElement author = message.getAsJsonObject().get("actor");
         final JsonElement twitter_entities = message.getAsJsonObject().get("twitter_entities");
         final JsonElement media = twitter_entities.getAsJsonObject().get("media");
 
         if (media != null) {
+            String postedTime = message.getAsJsonObject().get("postedTime").getAsString();
+
             String mediaUrl = ((JsonArray) media).get(0).getAsJsonObject().get("media_url").getAsString();
+
+            final JsonElement author = message.getAsJsonObject().get("actor");
             String authorName = author.getAsJsonObject().get("displayName").getAsString();
             String authorUsername = author.getAsJsonObject().get("preferredUsername").getAsString();
-            String postedTime = message.getAsJsonObject().get("postedTime").getAsString();
 
             String id = message.getAsJsonObject().get("id").getAsString();
             if (!printedIds.contains(id)) {
@@ -117,8 +119,7 @@ public class DevoxxTwitterPrinter {
 
     private void savePrintedId(String id) {
         printedIds.add(id);
-        try {
-            ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(printedIdsFile));
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(printedIdsFile))) {
             oos.writeObject(printedIds);
         } catch (IOException e) {
             e.printStackTrace();
@@ -127,8 +128,7 @@ public class DevoxxTwitterPrinter {
 
     private void loadPrintedTweets() {
         System.out.println("Loading printed tweets from "+printedIdsFile.getAbsolutePath());
-        try {
-            ObjectInputStream ois = new ObjectInputStream(new FileInputStream(printedIdsFile));
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(printedIdsFile))) {
             printedIds = (HashSet<String>) ois.readObject();
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
