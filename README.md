@@ -6,7 +6,7 @@ See MediaTweets.txt for the output from the app and DevoxxTweets.json for the RA
 
 ## ToDo's
 
-* Needs to run every 5 minutes
+
 * Create a twitter template for the printer
 * Execute the actual printing
 
@@ -14,6 +14,6 @@ See MediaTweets.txt for the output from the app and DevoxxTweets.json for the RA
 
 * Get Devoxx tweets
 * Store tweets that have been printed successfully, to avoid duplicates 
-
+* Needs to run every 5 minutes
 
 ![Print examples](https://c2.staticflickr.com/8/7600/27683391705_14abbcba05_z.jpg)
