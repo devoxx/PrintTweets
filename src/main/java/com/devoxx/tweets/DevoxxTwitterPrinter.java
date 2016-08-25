@@ -4,18 +4,24 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.sun.management.OperatingSystemMXBean;
 import org.apache.commons.codec.binary.Base64;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import java.io.*;
+import java.lang.management.ManagementFactory;
+import java.text.NumberFormat;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.StreamSupport;
 
 /**
  * The Devoxx twitter printer.
- *
+ * <p/>
  * Uses the IBM BlueMix Twitter Insights REST call.
  *
  * @author Stephan Janssen
@@ -28,21 +34,33 @@ public class DevoxxTwitterPrinter {
 
     private File printedIdsFile = new File("printedIds.bin");
 
-    public DevoxxTwitterPrinter() throws IOException {
-        String url = "https://cdeservice.mybluemix.net/api/v1/messages/search?q=Devoxx&from=0&size=100";
+    public DevoxxTwitterPrinter() {
+        final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+        scheduler.scheduleAtFixedRate(() -> {
+            try {
+                String url = "https://cdeservice.mybluemix.net/api/v1/messages/search?q=Devoxx&from=0&size=100";
 
-        loadPrintedTweets();
+                loadPrintedTweets();
 
-        while (url != null) {
+                while (url != null) {
 
-            JsonElement jsonTweets = readTweets(url);
+                    JsonElement jsonTweets = readTweets(url);
 
-            printTotalTweetsFound((JsonObject) jsonTweets);
+                    printTotalTweetsFound((JsonObject) jsonTweets);
 
-            printMediaTweets(jsonTweets);
+                    printMediaTweets(jsonTweets);
 
-            url = getNextUrl((JsonObject) jsonTweets);
-        }
+                    url = getNextUrl((JsonObject) jsonTweets);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        },0,5, TimeUnit.MINUTES);
+    }
+
+    public static void main(String[] args) {
+        new DevoxxTwitterPrinter();
     }
 
     /**
@@ -80,6 +98,7 @@ public class DevoxxTwitterPrinter {
 
     /**
      * The BlueMix Twitter Insights credentials.
+     *
      * @return base64login
      */
     private String getBase64Login() {
@@ -94,12 +113,13 @@ public class DevoxxTwitterPrinter {
         JsonArray tweetsArray = (JsonArray) ((JsonObject) jsonTweets).get("tweets");
 
         StreamSupport.stream(tweetsArray.spliterator(), false)
-                     .filter(t -> t.toString().contains("\"media\":"))
-                     .forEach(this::printTweet);
+                .filter(t -> t.toString().contains("\"media\":"))
+                .forEach(this::printTweet);
     }
 
     /**
      * Print a tweet.
+     *
      * @param jsonElement the tweet JSON element
      */
     private void printTweet(final JsonElement jsonElement) {
@@ -132,6 +152,7 @@ public class DevoxxTwitterPrinter {
 
     /**
      * Store the Set of printed twitter identifiers to disk.
+     *
      * @param id save the twitter id
      */
     private void savePrintedId(String id) {
@@ -145,22 +166,14 @@ public class DevoxxTwitterPrinter {
 
     /**
      * Load the printed tweets.
-     *
+     * <p/>
      * Delete this file if you want to start from scratch.
      */
     private void loadPrintedTweets() {
-        System.out.println("Loading printed tweets from "+printedIdsFile.getAbsolutePath());
+        System.out.println("Loading printed tweets from " + printedIdsFile.getAbsolutePath());
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(printedIdsFile))) {
             printedIds = (HashSet<String>) ois.readObject();
         } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static void main(String[] args) {
-        try {
-            new DevoxxTwitterPrinter();
-        } catch (IOException e) {
             e.printStackTrace();
         }
     }
